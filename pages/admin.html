@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Panel — Liberty-Runs</title>
+<link rel="stylesheet" href="../css/admin.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="admin-sidebar">
+  <div class="sidebar-logo">
+    LIBERTY<span>-</span>RUNS
+    <small>Admin Panel</small>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="#" class="active" data-panel="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+
+    <div class="nav-section-label">Inventory</div>
+    <a href="#" data-panel="inventory"><i class="fas fa-boxes"></i> Products</a>
+
+    <div class="nav-section-label">Customers</div>
+    <a href="#" data-panel="customers"><i class="fas fa-users"></i> Customers</a>
+    <a href="#" data-panel="credit"><i class="fas fa-credit-card"></i> Credit Limits</a>
+
+    <div class="nav-section-label">Orders</div>
+    <a href="#" data-panel="orders"><i class="fas fa-receipt"></i> All Orders</a>
+
+    <div class="nav-section-label">Reports</div>
+    <a href="#" data-panel="rpt-customers"><i class="fas fa-user-chart"></i> Customer Reports</a>
+    <a href="#" data-panel="rpt-inventory"><i class="fas fa-warehouse"></i> Inventory Report</a>
+    <a href="#" data-panel="rpt-sales"><i class="fas fa-chart-line"></i> Sales Report</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar" id="sidebar-avatar">A</div>
+    <div class="info">
+      <div class="name" id="sidebar-name">Admin</div>
+      <div class="role">Administrator</div>
+    </div>
+    <button class="logout-btn" id="btn-logout" title="Sign Out"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="admin-main">
+  <div id="admin-topbar">
+    <h2 id="topbar-title">Dashboard</h2>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--gray);" id="topbar-date"></span>
+    </div>
+  </div>
+
+  <div id="admin-content">
+
+    <!-- DASHBOARD -->
+    <div class="admin-panel active" id="panel-dashboard">
+      <div class="stats-grid" id="dash-stats">
+        <div class="stat-card"><div class="stat-icon red"><i class="fas fa-boxes"></i></div><div class="stat-info"><div class="val" id="stat-products">—</div><div class="lbl">Products</div></div></div>
+        <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-users"></i></div><div class="stat-info"><div class="val" id="stat-customers">—</div><div class="lbl">Customers</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-receipt"></i></div><div class="stat-info"><div class="val" id="stat-orders">—</div><div class="lbl">Orders</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><div class="val" id="stat-revenue">—</div><div class="lbl">Revenue</div></div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><h4>Recent Orders</h4></div>
+        <table class="data-table">
+          <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="dash-orders-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INVENTORY / PRODUCTS -->
+    <div class="admin-panel" id="panel-inventory">
+      <div class="table-card">
+        <div class="table-header">
+          <h4>Products</h4>
+          <div class="table-controls">
+            <input class="tbl-search" type="text" id="inv-search" placeholder="Search products...">
+            <select class="tbl-filter" id="inv-cat-filter">
+              <option value="">All Categories</option>
+              <option value="body-kits">Body Kits</option>
+              <option value="rims">Rims</option>
+              <option value="hood">Hood</option>
+              <option value="roof-scoops">Roof Scoops</option>
+              <option value="paint-wraps">Paint & Wraps</option>
+            </select>
+            <button class="btn-sm btn-danger" id="btn-add-product"><i class="fas fa-plus"></i> Add Product</button>
+          </div>
+        </div>
+        <table class="data-table" id="inv-table">
+          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Description</th><th>Qty</th><th>Price (₹)</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="inv-body"></tbody>
+        </table>
+        <div class="table-footer">
+          <span id="inv-count">0 products</span>
+          <div class="pagination" id="inv-pag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="admin-panel" id="panel-customers">
+      <div class="table-card">
+        <div class="table-header">
+          <h4>Customers</h4>
+          <div class="table-controls">
+            <input class="tbl-search" type="text" id="cust-search" placeholder="Search customers...">
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Credit Limit</th><th>Credit Used</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="cust-body"></tbody>
+        </table>
+        <div class="table-footer">
+          <span id="cust-count">0 customers</span>
+          <div class="pagination" id="cust-pag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREDIT LIMITS -->
+    <div class="admin-panel" id="panel-credit">
+      <div class="table-card">
+        <div class="table-header">
+          <h4>Customer Credit Limits</h4>
+          <div class="table-controls">
+            <input class="tbl-search" type="text" id="credit-search" placeholder="Search...">
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Customer</th><th>Email</th><th>Credit Limit (₹)</th><th>Credit Used (₹)</th><th>Available (₹)</th><th>Actions</th></tr></thead>
+          <tbody id="credit-body"></tbody>
+        </table>
+        <div class="table-footer">
+          <span id="credit-count">0 customers</span>
+          <div class="pagination" id="credit-pag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="admin-panel" id="panel-orders">
+      <div class="table-card">
+        <div class="table-header">
+          <h4>All Orders</h4>
+          <div class="table-controls">
+            <input class="tbl-search" type="text" id="ord-search" placeholder="Search order #, email...">
+            <select class="tbl-filter" id="ord-pay-filter">
+              <option value="">All Payments</option>
+              <option value="cash">Cash</option>
+              <option value="credit">Credit</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="ord-body"></tbody>
+        </table>
+        <div class="table-footer">
+          <span id="ord-count">0 orders</span>
+          <div class="pagination" id="ord-pag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT: CUSTOMERS -->
+    <div class="admin-panel" id="panel-rpt-customers">
+      <div class="report-tabs">
+        <button class="report-tab active" data-rtab="all-cust">All Customers</button>
+        <button class="report-tab" data-rtab="top10-cust">Top 10 Customers</button>
+        <button class="report-tab" data-rtab="cash-cust">Cash Purchases</button>
+        <button class="report-tab" data-rtab="credit-cust">Credit Purchases</button>
+      </div>
+      <div class="report-controls" id="rpt-cust-dates" style="display:none;">
+        <div class="rg"><label>From</label><input type="date" id="rpt-cust-from"></div>
+        <div class="rg"><label>To</label><input type="date" id="rpt-cust-to"></div>
+        <button class="btn-sm btn-danger" id="btn-rpt-cust-go">Generate</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><h4 id="rpt-cust-title">All Customers</h4></div>
+        <table class="data-table">
+          <thead id="rpt-cust-head"></thead>
+          <tbody id="rpt-cust-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORT: INVENTORY -->
+    <div class="admin-panel" id="panel-rpt-inventory">
+      <div class="report-tabs">
+        <button class="report-tab active" data-itab="all-stock">Current Stock — All</button>
+        <button class="report-tab" data-itab="cat-stock">Category Wise</button>
+        <button class="report-tab" data-itab="high-stock">High Stock (&gt;100)</button>
+        <button class="report-tab" data-itab="low-stock">Low Stock (&lt;15)</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h4 id="rpt-inv-title">Current Stock — All</h4>
+          <select class="tbl-filter" id="rpt-inv-cat" style="display:none;">
+            <option value="">All</option>
+            <option value="body-kits">Body Kits</option>
+            <option value="rims">Rims</option>
+            <option value="hood">Hood</option>
+            <option value="roof-scoops">Roof Scoops</option>
+            <option value="paint-wraps">Paint & Wraps</option>
+          </select>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Qty</th><th>Stock Level</th><th>Status</th></tr></thead>
+          <tbody id="rpt-inv-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORT: SALES -->
+    <div class="admin-panel" id="panel-rpt-sales">
+      <div class="report-tabs">
+        <button class="report-tab active" data-stab="all-sales">All Sales</button>
+        <button class="report-tab" data-stab="cat-sales">Category Wise</button>
+        <button class="report-tab" data-stab="cash-sales">Cash Sales</button>
+        <button class="report-tab" data-stab="credit-sales">Credit Sales</button>
+        <button class="report-tab" data-stab="top10-items">Top 10 Items</button>
+        <button class="report-tab" data-stab="bot10-items">Bottom 10 Items</button>
+      </div>
+      <div class="report-controls">
+        <div class="rg"><label>From</label><input type="date" id="rpt-sales-from"></div>
+        <div class="rg"><label>To</label><input type="date" id="rpt-sales-to"></div>
+        <button class="btn-sm btn-danger" id="btn-rpt-sales-go">Generate</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><h4 id="rpt-sales-title">All Sales</h4></div>
+        <table class="data-table">
+          <thead id="rpt-sales-head"></thead>
+          <tbody id="rpt-sales-body"></tbody>
+        </table>
+        <div class="table-footer">
+          <span id="rpt-sales-summary"></span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /admin-main -->
+
+<!-- ADD/EDIT PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <h4 id="product-modal-title">Add Product</h4>
+      <button class="modal-close" data-close="product-modal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="admin-modal-body">
+      <input type="hidden" id="pm-id">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="pm-cat">
+          <option value="">— Select —</option>
+          <option value="body-kits">Body Kits</option>
+          <option value="rims">Rims & Wheels</option>
+          <option value="hood">Hood Customizations</option>
+          <option value="roof-scoops">Roof Scoops</option>
+          <option value="paint-wraps">Paint & Wraps</option>
+        </select>
+        <div class="form-error" id="pm-cat-err">Select a category.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="form-input" type="text" id="pm-title" placeholder="Product title">
+        <div class="form-error" id="pm-title-err">Enter a title.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="pm-des" placeholder="Product description..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input class="form-input" type="number" id="pm-qty" placeholder="0" min="0">
+          <div class="form-error" id="pm-qty-err">Enter quantity.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Price (₹)</label>
+          <input class="form-input" type="number" id="pm-price" placeholder="0.00" min="0" step="0.01">
+          <div class="form-error" id="pm-price-err">Enter price.</div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-modal-footer">
+      <button class="btn-sm btn-secondary" data-close="product-modal">Cancel</button>
+      <button class="btn-sm btn-danger" id="btn-save-product">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM OVERLAY -->
+<div class="confirm-overlay" id="confirm-overlay" style="display:none;">
+  <div class="confirm-box">
+    <div class="ci" id="confirm-icon">⚠️</div>
+    <h4 id="confirm-title">Are you sure?</h4>
+    <p id="confirm-msg">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn-sm btn-danger" id="confirm-yes">Yes, Confirm</button>
+      <button class="btn-sm btn-secondary" id="confirm-no">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<script type="module" src="../js/admin.js"></script>
+</body>
+</html>
