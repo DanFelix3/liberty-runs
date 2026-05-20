@@ -92,7 +92,7 @@
           </div>
         </div>
         <table class="data-table" id="inv-table">
-          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Description</th><th>Qty</th><th>Price (₹)</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Description</th><th>Image URL</th><th>Qty</th><th>Price (₹)</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="inv-body"></tbody>
         </table>
         <div class="table-footer">
@@ -275,6 +275,10 @@
       <div class="form-group">
         <label class="form-label">Description</label>
         <textarea class="form-textarea" id="pm-des" placeholder="Product description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image URL <span style="font-size:11px;color:var(--gray);font-weight:400;">(optional — paste a direct image link)</span></label>
+        <input class="form-input" type="url" id="pm-img-url" placeholder="https://example.com/product-image.jpg">
       </div>
       <div class="form-row">
         <div class="form-group">

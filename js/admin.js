@@ -133,6 +133,7 @@ function renderInventory(){
       <td><input class="td-edit" data-field="cat_id" value="${p.cat_id||''}" list="cat-list" style="width:130px;"></td>
       <td><input class="td-edit" data-field="title" value="${escHtml(p.title||'')}" style="width:160px;"></td>
       <td><input class="td-edit" data-field="des" value="${escHtml(p.des||'')}" style="width:180px;"></td>
+      <td><input class="td-edit" data-field="img_url" value="${escHtml(p.img_url||'')}" placeholder="https://..." style="width:180px;" title="Image URL"></td>
       <td><input class="td-edit" data-field="qty" type="number" value="${p.qty||0}" style="width:70px;"></td>
       <td><input class="td-edit" data-field="price" type="number" value="${p.price||0}" step="0.01" style="width:90px;"></td>
       <td><span class="badge ${p.active?'badge-green':'badge-gray'}">${p.active?'Active':'Inactive'}</span></td>
@@ -151,7 +152,7 @@ function renderInventory(){
 }
 $('#btn-add-product').on('click',()=>{
   $('#pm-id').val('');$('#pm-cat').val('');$('#pm-title').val('');
-  $('#pm-des').val('');$('#pm-qty').val('');$('#pm-price').val('');
+  $('#pm-des').val('');$('#pm-qty').val('');$('#pm-price').val('');$('#pm-img-url').val('');
   $('#product-modal-title').text('Add Product');
   openModal('product-modal');
 });
@@ -165,7 +166,8 @@ $('#btn-save-product').on('click',async()=>{
   if(isNaN(qty)||qty<0){$('#pm-qty-err').show();ok=false;}else{$('#pm-qty-err').hide();}
   if(isNaN(price)||price<0){$('#pm-price-err').show();ok=false;}else{$('#pm-price-err').hide();}
   if(!ok)return;
-  const data={cat_id,title,des,qty,price,active:true,updatedAt:serverTimestamp()};
+  const img_url=$('#pm-img-url').val().trim();
+  const data={cat_id,title,des,qty,price,img_url:img_url||'',active:true,updatedAt:serverTimestamp()};
   const id=$('#pm-id').val();
   try{
     if(id){await updateDoc(doc(db,'products',id),data);}

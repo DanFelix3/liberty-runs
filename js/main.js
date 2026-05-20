@@ -193,10 +193,13 @@ function renderSlides(){
       <div class="slide-bg">
         <div class="slide-bg-color" style="background:${item.color}"></div>
         <div class="slide-product-visual">
-          <div class="slide-card-placeholder" style="background:${item.color};">
-            <div class="slide-icon">${item.icon}</div>
-            <div class="slide-label">${item.catLabel}</div>
-          </div>
+          ${item.img_url
+            ?`<img src="${item.img_url}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" onerror="this.outerHTML='<div class=\\'slide-card-placeholder\\' style=\\'background:${item.color};\\'><div class=\\'slide-icon\\'>${item.icon}</div><div class=\\'slide-label\\'>${item.catLabel}</div></div>'">`
+            :`<div class="slide-card-placeholder" style="background:${item.color};">
+              <div class="slide-icon">${item.icon}</div>
+              <div class="slide-label">${item.catLabel}</div>
+            </div>`
+          }
         </div>
       </div>
       <div class="slide-content">
@@ -257,10 +260,14 @@ function renderGrid(selector,prods,page){
 function productCardHtml(p){
   const catObj=CATEGORIES.find(c=>c.id===p.cat_id)||{icon:'🔧',label:'Parts'};
   const lowStock=p.qty>0&&p.qty<15;
+  const imgContent=p.img_url
+    ?`<img src="${p.img_url}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+       <span style="font-size:52px;position:relative;z-index:1;display:none;">${catObj.icon}</span>`
+    :`<span style="font-size:52px;position:relative;z-index:1;">${catObj.icon}</span>`;
   return `
   <div class="product-card" data-id="${p.id}">
-    <div class="product-card-img" style="background:${SLIDE_COLORS[p.cat_id]||'var(--dark2)'}">
-      <span style="font-size:52px;position:relative;z-index:1;">${catObj.icon}</span>
+    <div class="product-card-img" style="background:${p.img_url?'var(--dark2)':SLIDE_COLORS[p.cat_id]||'var(--dark2)'}">
+      ${imgContent}
       ${p.qty===0?'<div class="product-card-badge" style="background:var(--gray2)">Out of Stock</div>':''}
       ${lowStock?'<div class="product-card-badge">Low Stock</div>':''}
     </div>
@@ -301,8 +308,11 @@ window.openProductModal=function(id){
   const delivDate=new Date();delivDate.setDate(delivDate.getDate()+delivDays);
   const delivStr=delivDate.toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric'});
   $('#modal-content-inner').html(`
-    <div class="modal-visual" style="background:${SLIDE_COLORS[p.cat_id]||'var(--dark2)'}">
-      <span style="font-size:96px;">${catObj.icon}</span>
+    <div class="modal-visual" style="background:${p.img_url?'#111':SLIDE_COLORS[p.cat_id]||'var(--dark2)'}${p.img_url?';padding:0;overflow:hidden':''}">
+      ${p.img_url
+        ?`<img src="${p.img_url}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.style.background='${SLIDE_COLORS[p.cat_id]||'var(--dark2)'}';this.outerHTML='<span style=\\'font-size:96px;\\'>${catObj.icon}</span>'">`
+        :`<span style="font-size:96px;">${catObj.icon}</span>`
+      }
     </div>
     <div class="modal-body">
       <span class="modal-cat">${catObj.label}</span>
