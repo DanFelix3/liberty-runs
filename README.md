@@ -22,37 +22,6 @@ liberty-runs/
 
 ---
 
-## ⚙️ Setup Steps
-
-### 1. Paste Your Firebase Config
-Open `js/firebase-config.js` and replace every `YOUR_*` value with your real Firebase project config from the Firebase console.
-
-### 2. Serve the Project
-You MUST use a local server (not file://) because of ES modules and Firebase.
-
-**Option A — VS Code Live Server:**
-Install the "Live Server" extension → right-click `index.html` → Open with Live Server
-
-**Option B — Python:**
-```bash
-cd liberty-runs
-python -m http.server 5500
-```
-Then open: http://localhost:5500
-
-**Option C — Node.js:**
-```bash
-npx serve .
-```
-
-### 3. Seed Sample Products
-1. Sign in as Admin on the store
-2. Navigate to: http://localhost:5500/pages/seed.html
-3. Click **"Seed Products into Firestore"**
-4. 25 sample products across all 5 categories will be added
-
----
-
 ## 👤 Accounts
 
 | Role | How to Create |
@@ -103,8 +72,3 @@ Admin email must match the `email` field in Firestore → `admins` → `admin1` 
 
 ---
 
-## ⚠️ Notes
-- Cart is stored in localStorage per user
-- Stock is decremented on order completion
-- Credit used is incremented on credit orders
-- Admin is identified by matching email to `admins/admin1` doc
