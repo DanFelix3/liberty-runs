@@ -12,12 +12,11 @@ liberty-runs/
 │   ├── main.css            ← Storefront styles
 │   └── admin.css           ← Admin panel styles
 ├── js/
-│   ├── firebase-config.js  ← ⚠️ YOUR CONFIG GOES HERE
+│   ├── firebase-config.js  ← config of firebase
 │   ├── main.js             ← Storefront logic
 │   └── admin.js            ← Admin panel logic
 └── pages/
     ├── admin.html          ← Admin panel
-    └── seed.html           ← One-time product seeder
 ```
 
 ---
