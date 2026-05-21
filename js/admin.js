@@ -1,4 +1,4 @@
-import {auth,db} from '../js/firebase-config.js';
+import {auth,db,storage} from '../js/firebase-config.js';
 import {
   signOut,onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -6,6 +6,9 @@ import {
   collection,doc,getDoc,getDocs,addDoc,updateDoc,deleteDoc,
   query,where,orderBy,serverTimestamp,Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  ref,uploadBytesResumable,getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // ─── GLOBALS ───────────────────────────────────────────────
 const PAGE_SIZE=10;
@@ -17,6 +20,63 @@ let currentSalesTab='all-sales';let currentCustTab='all-cust';
 let currentInvTab='all-stock';let currentStockCat='';
 
 const CAT_LABELS={'body-kits':'Body Kits','rims':'Rims','hood':'Hood','roof-scoops':'Roof Scoops','paint-wraps':'Paint & Wraps'};
+
+// ─── IMAGE UPLOAD HELPERS ───────────────────────────────────
+function resetImgUpload(){
+  $('#pm-img-final').val('');
+  $('#pm-img-url').val('');
+  $('#img-upload-bar').css('width','0%');
+  $('#img-upload-progress').hide();
+  $('#img-upload-preview').html(`
+    <i class="fas fa-cloud-upload-alt" style="font-size:28px;color:var(--gray2);margin-bottom:8px;display:block;"></i>
+    <span style="font-size:13px;color:var(--gray);">Click to upload image</span>
+    <span style="font-size:11px;color:var(--gray2);margin-top:4px;display:block;">JPG, PNG, WEBP — max 5MB</span>
+  `);
+  $('#img-upload-box').css('border-color','');
+}
+
+function setImgPreview(url){
+  $('#img-upload-preview').html(`<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">`);
+  $('#img-upload-box').css('border-color','var(--green)');
+  $('#pm-img-final').val(url);
+}
+
+$(document).on('change','#pm-img-file',function(){
+  const file=this.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){alert('Image must be under 5MB.');return;}
+  const ext=file.name.split('.').pop();
+  const path=`products/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const storageRef=ref(storage,path);
+  const task=uploadBytesResumable(storageRef,file);
+  $('#img-upload-progress').show();
+  $('#img-upload-box').css('pointer-events','none');
+  task.on('state_changed',
+    snap=>{
+      const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+      $('#img-upload-bar').css('width',pct+'%');
+    },
+    err=>{
+      console.error(err);
+      alert('Upload failed: '+err.message);
+      $('#img-upload-box').css('pointer-events','');
+      $('#img-upload-progress').hide();
+    },
+    async ()=>{
+      const url=await getDownloadURL(task.snapshot.ref);
+      setImgPreview(url);
+      $('#img-upload-progress').hide();
+      $('#img-upload-box').css('pointer-events','');
+    }
+  );
+});
+
+$(document).on('blur','#pm-img-url',function(){
+  const url=$(this).val().trim();
+  if(url){ $('#pm-img-final').val(url); setImgPreview(url); }
+});
+
+
 
 // ─── DATE / TOPBAR ─────────────────────────────────────────
 $('#topbar-date').text(new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
@@ -152,7 +212,8 @@ function renderInventory(){
 }
 $('#btn-add-product').on('click',()=>{
   $('#pm-id').val('');$('#pm-cat').val('');$('#pm-title').val('');
-  $('#pm-des').val('');$('#pm-qty').val('');$('#pm-price').val('');$('#pm-img-url').val('');
+  $('#pm-des').val('');$('#pm-qty').val('');$('#pm-price').val('');
+  resetImgUpload();
   $('#product-modal-title').text('Add Product');
   openModal('product-modal');
 });
@@ -166,7 +227,7 @@ $('#btn-save-product').on('click',async()=>{
   if(isNaN(qty)||qty<0){$('#pm-qty-err').show();ok=false;}else{$('#pm-qty-err').hide();}
   if(isNaN(price)||price<0){$('#pm-price-err').show();ok=false;}else{$('#pm-price-err').hide();}
   if(!ok)return;
-  const img_url=$('#pm-img-url').val().trim();
+  const img_url=$('#pm-img-final').val().trim()||$('#pm-img-url').val().trim();
   const data={cat_id,title,des,qty,price,img_url:img_url||'',active:true,updatedAt:serverTimestamp()};
   const id=$('#pm-id').val();
   try{
